@@ -1,3 +1,4 @@
+using EventDrivenCQRS.Infrastructure.Messaging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
@@ -33,6 +34,12 @@ namespace EventDrivenCQRS.Infrastructure
                     Password = configuration["RabbitMQ:Password"]
                 });
 
+            services.AddSingleton<RabbitMqService>();
+            services.AddSingleton<RetryProcessor>();
+            services.AddScoped<RabbitMqInitializer>();
+            
+            services.AddSingleton<IConnectionMultiplexer>(sp =>
+                ConnectionMultiplexer.Connect(configuration.GetConnectionString("Redis")));
             return services;
         }
     }
